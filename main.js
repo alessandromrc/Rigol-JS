@@ -8,7 +8,11 @@ async function Main() {
 
   console.log(await Rigol.getDevice());
 
-  await Rigol.Screenshot("./screenshots/Square_NE555");
+  //await Rigol.Screenshot("./screenshots/Square_NE555");
+
+  Rigol.setCursorManualVerticalUnit("percent");
+
+  console.log(await Rigol.getCursorManualVerticalUnit())
 
 };
 

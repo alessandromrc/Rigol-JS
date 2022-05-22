@@ -311,7 +311,7 @@ class RigolConnector {
 
   setChannelAmplitudeUnit(channel, unit) {
     if (typeof channel != "number") throw new Error("Channel must be a number");
-    switch (unit.toUpperCase()) {
+    switch (unit.toString().toUpperCase()) {
       case "VOLT":
         client.write(`:CHANNEL${channel}:UNITS VOLT\n`);
         break;
@@ -337,7 +337,6 @@ class RigolConnector {
     });
   }
 
-
   setChannelVernier(channel, vernier_value) {
     switch (vernier_value) {
       case "ON":
@@ -357,7 +356,6 @@ class RigolConnector {
     }
   }
 
-
   getChannelVernier(channel) {
     return new Promise((resolve) => {
       if (typeof channel != "number")
@@ -366,11 +364,124 @@ class RigolConnector {
       client.on("data", (data) => {
         resolve(data.toString());
       });
-    })
+    });
   }
 
+  setCursorMode(mode) {
+    switch (mode.toString().toUpperCase()) {
+      case "OFF":
+        client.write(`:CURSOR:MODE OFF\n`);
+        break;
+      case "MANUAL":
+        client.write(`:CURSOR:MODE MANUAL\n`);
+        break;
+      case "TRACK":
+        client.write(`:CURSOR:MODE TRACK\n`);
+        break;
+      case "AUTO":
+        client.write(`:CURSOR:MODE AUTO\n`);
+        break;
+      case "XY":
+        client.write(`:CURSOR:MODE XY\n`);
+        break;
+      default:
+        console.log("Invalid value for cursor mode");
+    }
+  }
 
+  getCursorMode() {
+    return new Promise((resolve) => {
+      client.write(`:CURSOR:MODE?\n`);
+      client.on("data", (data) => {
+        resolve(data.toString());
+      });
+    });
+  }
 
+  setCursorManualType(type) {
+    switch (type.toString().toUpperCase()) {
+      case "X":
+        client.write(`:CURSOR:MANUAL:TYPE X\n`);
+        break;
+      case "Y":
+        client.write(`:CURSOR:MANUAL:TYPE Y\n`);
+        break;
+      default:
+        console.log("Invalid value for cursor manual type");
+    }
+  }
+
+  getCursorManualType() {
+    return new Promise((resolve) => {
+      client.write(`:CURSOR:MANUAL:TYPE?\n`);
+      client.on("data", (data) => {
+        resolve(data.toString());
+      });
+    });
+  }
+
+  setCursorManualSource(source) {
+    client.write(`:CURSOR:MANUAL:SOURCE ${source}\n`);
+  }
+
+  getCursorManualSource() {
+    return new Promise((resolve) => {
+      client.write(`:CURSOR:MANUAL:SOURCE?\n`);
+      client.on("data", (data) => {
+        resolve(data.toString());
+      });
+    });
+  }
+
+  setCursorManualHorizontalUnit(unit) {
+    switch (unit.toString().toUpperCase()) {
+      case "S":
+        client.write(`:CURSOR:MANUAL:TUNIT S\n`);
+        break;
+      case "HZ":
+        client.write(`:CURSOR:MANUAL:TUNIT HZ\n`);
+        break;
+      case "DEGREE":
+        client.write(`:CURSOR:MANUAL:TUNIT DEGR\n`);
+        break;
+      case "PERCENT":
+        client.write(`:CURSOR:MANUAL:TUNIT PERC\n`);
+        break;
+      default:
+        console.log("Invalid value for cursor manual horizontal unit");
+    }
+  }
+
+  getCursorManualHorizontalUnit() {
+    return new Promise((resolve) => {
+      client.write(`:CURSOR:MANUAL:TUNIT?\n`);
+      client.on("data", (data) => {
+        resolve(data.toString());
+      });
+    });
+  }
+
+  setCursorManualVerticalUnit(unit) {
+    switch (unit.toString().toUpperCase()) {
+      case "PERCENT":
+        client.write(`:CURSOR:MANUAL:VUNIT PERC\n`);
+        break;
+      case "SOURCE":
+        client.write(`:CURSOR:MANUAL:VUNIT SOUR\n`);
+        break;
+      default:
+        console.log("Invalid value for cursor manual vertical unit");
+    }
+  }
+
+  getCursorManualVerticalUnit() {
+    return new Promise((resolve) => {
+      client.write(`:CURSOR:MANUAL:VUNIT?\n`);
+      client.on("data", (data) => {
+        resolve(data.toString());
+      });
+    });
+  }
 
 }
 
