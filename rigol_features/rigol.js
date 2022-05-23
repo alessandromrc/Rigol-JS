@@ -15,37 +15,41 @@ class RigolConnector {
     return 0;
   }
 
-  sleep(ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-  }
-
-  Screenshot(file_name) {
-    return new Promise((resolve, reject) => {
-      client.write("DISP:DATA?\n");
-      client.on("data", (data) => {
-        if (conn_timeout) {
-          data_buf = Buffer.concat([data_buf, data]);
-        } else {
-          data_buf = data.slice(data.indexOf("BM"));
-        }
-
-        clearTimeout(conn_timeout);
-        conn_timeout = setTimeout(() => {
-          if (data_buf.length >= 1000) {
-            jimp.read(data_buf).then((image) => {
-              image.write(file_name + ".png");
-              resolve(true);
-            });
-          } else {
-            console.log("Socket timeout without sufficient data");
-            reject(false);
-          }
-        }, 1000);
+  util = {
+    sleep(ms) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms);
       });
-    });
-  }
+    },
+  };
+
+  features = {
+    Screenshot: function (file_name) {
+      return new Promise((resolve, reject) => {
+        client.write("DISP:DATA?\n");
+        client.on("data", (data) => {
+          if (conn_timeout) {
+            data_buf = Buffer.concat([data_buf, data]);
+          } else {
+            data_buf = data.slice(data.indexOf("BM"));
+          }
+
+          clearTimeout(conn_timeout);
+          conn_timeout = setTimeout(() => {
+            if (data_buf.length >= 1000) {
+              jimp.read(data_buf).then((image) => {
+                image.write(file_name + ".png");
+                resolve(true);
+              });
+            } else {
+              console.log("Socket timeout without sufficient data");
+              reject(false);
+            }
+          }, 1000);
+        });
+      });
+    },
+  };
 
   // Device Namespace
   Device = {
@@ -75,17 +79,6 @@ class RigolConnector {
     },
   };
 
-  // Trigger Namespace
-
-  Trigger = {
-    single: function () {
-      client.write(":SINGlE\n");
-    },
-
-    force: function () {
-      client.write(":TFORCE\n");
-    },
-  };
   // Averages Namespace
 
   Averages = {
@@ -389,29 +382,29 @@ class RigolConnector {
     },
   };
 
-  setCursorMode(mode) {
-    switch (mode.toString().toUpperCase()) {
-      case "OFF":
-        client.write(`:CURSOR:MODE OFF\n`);
-        break;
-      case "MANUAL":
-        client.write(`:CURSOR:MODE MANUAL\n`);
-        break;
-      case "TRACK":
-        client.write(`:CURSOR:MODE TRACK\n`);
-        break;
-      case "AUTO":
-        client.write(`:CURSOR:MODE AUTO\n`);
-        break;
-      case "XY":
-        client.write(`:CURSOR:MODE XY\n`);
-        break;
-      default:
-        console.log("Invalid value for cursor mode");
-    }
-  }
+  Cursor = {
+    setCursorMode: function (mode) {
+      switch (mode.toString().toUpperCase()) {
+        case "OFF":
+          client.write(`:CURSOR:MODE OFF\n`);
+          break;
+        case "MANUAL":
+          client.write(`:CURSOR:MODE MANUAL\n`);
+          break;
+        case "TRACK":
+          client.write(`:CURSOR:MODE TRACK\n`);
+          break;
+        case "AUTO":
+          client.write(`:CURSOR:MODE AUTO\n`);
+          break;
+        case "XY":
+          client.write(`:CURSOR:MODE XY\n`);
+          break;
+        default:
+          console.log("Invalid value for cursor mode");
+      }
+    },
 
-  CursorManual = {
     getMode: function () {
       return new Promise((resolve) => {
         client.write(`:CURSOR:MODE?\n`);
@@ -2845,9 +2838,9 @@ class RigolConnector {
       client.write(`:MEASURE:STATISTIC:ITEM ${item} ${source}\n`);
     },
 
-    getStatisticItem: function (item) {
+    getStatisticItem: function (item, source) {
       return new Promise((resolve) => {
-        client.write(`:MEASURE:STATISTIC:ITEM? ${item}\n`);
+        client.write(`:MEASURE:STATISTIC:ITEM? ${item} ${source}\n`);
         client.on("data", (data) => {
           resolve(data.toString());
         });
@@ -3197,6 +3190,15 @@ class RigolConnector {
   };
 
   trigger = {
+
+    single: function () {
+      client.write(":SINGlE\n");
+    },
+
+    force: function () {
+      client.write(":TFORCE\n");
+    },
+
     setMode: function (value) {
       client.write(`:TRIGGER:MODE ${value}\n`);
     },

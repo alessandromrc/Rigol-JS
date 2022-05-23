@@ -8,9 +8,6 @@
   },
   "author": "alessandromrc",
   "dependencies": {
-    "jimp": "^0.16.1",
-    "netcat": "^1.5.0",
-    "node-netcat": "^1.4.8",
-    "telnet-client": "^2.0.2"
-  }
+    "jimp": "^0.16.1"
+    }
 }
