@@ -6,13 +6,10 @@ const instrument_port = 5555;
 async function Main() {
   const Rigol = new RigolConnector(instrument_ip, instrument_port);
 
-  console.log(await Rigol.getDevice());
+  console.log(await Rigol.waveform.getPreamble());
 
   //await Rigol.Screenshot("./screenshots/Square_NE555");
 
-  Rigol.setCursorManualVerticalUnit("percent");
-
-  console.log(await Rigol.getCursorManualVerticalUnit())
 
 };
 
