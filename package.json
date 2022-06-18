@@ -8,6 +8,6 @@
   },
   "author": "alessandromrc",
   "dependencies": {
-    "jimp": "^0.16.1"
-    }
+    "jimp": "^0.16.0"
+  }
 }
