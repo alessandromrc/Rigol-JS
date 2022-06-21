@@ -1,5 +1,5 @@
 # Rigol-JS
-Single File Library for Rigol DS1054 made with Javascript running on NodeJS
+Single File Library for Rigol DS1000Z series made with Javascript running on NodeJS
 
 
 ## Example code:
