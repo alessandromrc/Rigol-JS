@@ -4,11 +4,9 @@ const jimp = require("jimp");
 
 const client = new net.Socket();
 const date = new Date();
-let conn_timeout = null;
-let data_buf = Buffer.from([]);
 
 class RigolConnector {
-  constructor(ip, port) {
+  constructor (ip, port) {
     client.connect(port, ip, () => {
       return 1;
     });
@@ -26,6 +24,9 @@ class RigolConnector {
   features = {
     Screenshot: function (file_name) {
       return new Promise((resolve, reject) => {
+        let conn_timeout = null;
+        let data_buf = [];
+
         client.write("DISP:DATA?\n");
         client.on("data", (data) => {
           if (conn_timeout) {
@@ -33,13 +34,20 @@ class RigolConnector {
           } else {
             data_buf = data.slice(data.indexOf("BM"));
           }
-
           clearTimeout(conn_timeout);
           conn_timeout = setTimeout(() => {
             if (data_buf.length >= 1000) {
               jimp.read(data_buf).then((image) => {
-                image.write(file_name + ".png");
-                resolve(true);
+                image.getBuffer(jimp.MIME_PNG, (err, buffer) => {
+                  fs.writeFile(file_name + ".png", buffer, (err) => {
+                    if (err)
+                      console.log(err);
+                    else {
+                      client.removeAllListeners(); // keeps us protected from memory leaks! :)
+                      resolve(true);
+                    }
+                  });
+                });
               });
             } else {
               console.log("Socket timeout without sufficient data");
